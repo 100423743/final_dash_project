@@ -10,6 +10,9 @@ app = dash.Dash(__name__, title="Dash Project - Ignacio Medina & María Cristina
 df_url_rocks = 'https://query.data.world/s/xzozlqhuagxyazzgc3avtgcaw2yqxk'
 df_rocks = pd.read_csv(df_url_rocks)
 
+df_url_fifa = 'https://query.data.world/s/457fikckeqdoemry75fqfhjoqwtrxv'
+df_fifa = pd.read_csv(df_url_fifa)
+
 app.layout= html.Div([
     html.Div([html.H1(app.title, className="app-header--title")],
         className= "app-header",
@@ -23,3 +26,6 @@ app.layout= html.Div([
     ],
     className= "app-body")
 ])
+
+
+
