@@ -14,11 +14,11 @@ import json
 
 app = dash.Dash(__name__, title="Dash Project - Ignacio Medina & María Cristina Sánchez")
 
-df_url_rocks='https://raw.githubusercontent.com/mariacristinasi/class_dash/main/rocks.csv' #it must be modifies to the github current repository
-df_rocks = pd.read_csv(df_url_rocks, error_bad_lines=False)
+# df_url_rocks='https://raw.githubusercontent.com/mariacristinasi/class_dash/main/rocks.csv' 
+# df_rocks = pd.read_csv(df_url_rocks, error_bad_lines=False)
 
-# df_url_fifa = 'https://query.data.world/s/457fikckeqdoemry75fqfhjoqwtrxv'
-# df_fifa = pd.read_csv(df_url_fifa)
+df_rocks = pd.read_csv('https://query.data.world/s/5iexdkk6ujdrzsih3s3cbymh6pfaeq')
+
 
 app.layout= html.Div([
     html.Div([html.H1(app.title, className="app-header--title")],
@@ -46,7 +46,7 @@ fifa_tab=html.Div([
     className= "app-body")
 ])
 
-# opt_stats=df['!!!!!!!!!'].sort_values().unique()
+# opt_stats=df['stats'].sort_values().unique()
 
 stats_tab=html.Div([
     html.Div([  
@@ -96,7 +96,7 @@ def render_content(tab):
 #@app.callback(Output('sel_stats', 'children'), 
 #    Input('my-dropdown', 'value'))
 #def filter(values):
-#     filter = df['vore'].isin(values) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+#     filter = df['stats'].isin(values) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
 #    return df[filter].to_json(date_format='iso', orient='split')
 
 if __name__ == '__main__':
