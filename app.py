@@ -6,3 +6,6 @@ import pandas as pd
 
 df_url_rocks = 'https://query.data.world/s/xzozlqhuagxyazzgc3avtgcaw2yqxk'
 df_rocks = pd.read_csv(df_url_rocks)
+
+df_url_fifa = 'https://query.data.world/s/457fikckeqdoemry75fqfhjoqwtrxv'
+df_fifa = pd.read_csv(df_url_fifa)
