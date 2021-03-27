@@ -76,24 +76,24 @@ fifa_tab=html.Div([
 ])
 
 ## STATS SELECTOR
-        html.Label(["Select player stat:", 
-                    dcc.Dropdown('my-dropdown', options= opt_stat, value= [opt_stat[0]['value']], multi=False)
-                ]),
-
-        df_stat = df_fifa['Stat'].sort_values().unique()
-        opt_stat = [{'label': x + 'Stat', 'value': x} for x in df_stat]
+#        html.Label(["Select player stat:", 
+#                    dcc.Dropdown('my-dropdown', options= opt_stat, value= [opt_stat[0]['value']], multi=False)
+#                ]),
+#
+#        df_stat = df_fifa['Stat'].sort_values().unique()
+ #       opt_stat = [{'label': x + 'Stat', 'value': x} for x in df_stat]
         # Discrete Colors in Python
         # https://plotly.com/python/discrete-color/
-        col_stat = {x: px.colors.qualitative.G10[i] for i,x in enumerate(df_stat)}
+#        col_stat = {x: px.colors.qualitative.G10[i] for i,x in enumerate(df_stat)}
 
 # opt_stats=df['stats'].sort_values().unique()
 
 stats_tab=html.Div([
     html.Div([  
-        html.Label(["Select types of feeding strategies:", 
+        #html.Label(["Select types of feeding strategies:", 
             # dcc.Dropdown('my-dropdown', options= opt_stats, value= [opt_stats[0]['value']], multi=True) !!!!!!!!
-        ]),
-        html.Div(id='sel_stats', style={'display': 'none'}),
+        #]),
+        #html.Div(id='sel_stats', style={'display': 'none'}),
         dcc.Tabs(id="tabs_stats", value='tab-gen', children=[
             dcc.Tab(label='General Rating', value='tab-gen'),
             dcc.Tab(label='Rating per Position', value='tab-pos'),
@@ -129,9 +129,9 @@ rocks_tab=html.Div([
 #                columns=[{"name": i, "id": i} for i in df_fifa.columns]
 #            )
 
-@app.callback(Output('tabs-content', 'children'),
+@app.callback(Output('fifa-content', 'children'),
               Input('tabs_sub_fifa', 'value'))
-def render_content(tab):
+def render_content1(tab):
     if tab == 'tab-stats':
         return stats_tab
     elif tab == 'tab-top':
@@ -139,9 +139,9 @@ def render_content(tab):
     elif tab == 'tab-price':
         return price_tab
 
-@app.callback(Output('fifa-content', 'children'),
-              Input('tabs_fifa', 'value'))
-def render_content(tab):
+@app.callback(Output('tabs-content', 'children'),
+              Input('tabs', 'value'))
+def render_content2(tab):
     if tab == 'tab-fifa':
         return fifa_tab
     elif tab == 'tab-rocks':
