@@ -7,11 +7,11 @@ import pandas as pd
 
 app = dash.Dash(__name__, title="Dash Project - Ignacio Medina & María Cristina Sánchez")
 
-df_url_rocks = 'https://query.data.world/s/xzozlqhuagxyazzgc3avtgcaw2yqxk'
-df_rocks = pd.read_csv(df_url_rocks)
+# df_url_rocks = 'https://query.data.world/s/xzozlqhuagxyazzgc3avtgcaw2yqxk'
+# df_rocks = pd.read_csv(df_url_rocks)
 
-df_url_fifa = 'https://query.data.world/s/457fikckeqdoemry75fqfhjoqwtrxv'
-df_fifa = pd.read_csv(df_url_fifa)
+# df_url_fifa = 'https://query.data.world/s/457fikckeqdoemry75fqfhjoqwtrxv'
+# df_fifa = pd.read_csv(df_url_fifa)
 
 app.layout= html.Div([
     html.Div([html.H1(app.title, className="app-header--title")],
@@ -28,4 +28,5 @@ app.layout= html.Div([
 ])
 
 
-
+if __name__ == '__main__':
+    app.server.run(debug=True)
