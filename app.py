@@ -249,7 +249,7 @@ pos_tab=html.Div([
 
 rocks_tab=html.Div([
     html.Div([  
-        dcc.Tabs(id="tabs_sub_rocks", value='tab-char', 
+        dcc.Tabs(id="tabs_sub_rocks", value='tab-grain', 
  #       style={
  #       'width': '100%',
  #       'font-size': '80%',
@@ -259,7 +259,7 @@ rocks_tab=html.Div([
  #       'fontWeight': 'bold'
  #       },
         children=[
-            dcc.Tab(label='Characteristics per core', value='tab-char'),
+            dcc.Tab(label='Grain Size per core', value='tab-grain'),
             dcc.Tab(label='Composition per depth', value='tab-comp'),
             dcc.Tab(label='Materials abundance', value='tab-mat'),
         ]),
@@ -274,40 +274,13 @@ rocks_tab=html.Div([
 df_core=df_rocks['Core #'].sort_values().unique()
 opt_core = [{'label': x, 'value': x} for x in df_core]
 
-char_tab = html.Div([
+grain_tab = html.Div([
     html.Div([  
         html.Label(["Select core:", 
                     dcc.Dropdown('my-drop-core', options= opt_core, value=[opt_core[0]['value']], multi=True)                
         ]), 
-        dcc.Tabs(id="tabs_char", value='tab-char-grain', 
- #       style={
- #       'width': '100%',
- #       'font-size': '80%',
- #       'height': '3vh',
- #       'borderBottom': '1px solid #d6d6d6',
- #       'padding': '6px',
- #       'fontWeight': 'bold'
- #       },
-        children=[
-            dcc.Tab(label='Grain size', value='tab-char-grain'),
-            dcc.Tab(label='Composition', value='tab-char-comp')
-        ]),
-        html.Div(id='char-content')
-    ],
-    className= "app-body")
-])
-
-char_grain_tab=html.Div([
-    html.Div([  
-       html.Div(id='data_core', style={'display': 'none'}),
-       dcc.Graph(id="char-grain-graph") 
-    ],
-    className= "app-body")
-])
-
-char_comp_tab=html.Div([
-    html.Div([ 
-
+        html.Div(id='data_core', style={'display': 'none'}),
+        dcc.Graph(id="char-grain-graph") 
     ],
     className= "app-body")
 ])
@@ -395,14 +368,6 @@ def update_graph1(data, tab):
     return px.scatter(dff, x="stat_value", y="Overall", color="Position")
     #color_discrete_sequence=px.colors.qualitative.G10
     #color_discrete_map=col_stat)
-      
-   
-### CALLBACKS TABLE FIFA
-@app.callback(Output('data_nat_team', 'children'), 
-    Input('my-drop-nat', 'value'),
-    Input('my-drop-team', 'value'))
-def filter(nat, team):
-     filter = df_fifa['Nationality'].isin(nat) & df_fifa['Team'].isin(team)
 
 ###### CALLBACKS POSITION FIFA
 
@@ -448,21 +413,12 @@ def update_table(data):
 @app.callback(Output('rocks-content', 'children'),
               Input('tabs_sub_rocks', 'value'))
 def render_content3(tab):
-    if tab == 'tab-char':
-          return char_tab
-      elif tab == 'tab-comp':
-          return comp_tab
-      elif tab == 'tab-mat':
-          return mat_tab 
-
-### CALLBACKS CHARACTERISTICS ROCKS
-@app.callback(Output('char-content', 'children'),
-              Input('tabs_char', 'value'))
-def render_content(tab):
-    if tab == 'tab-char-grain':
-        return char_grain_tab 
-    elif tab == 'tab-char-comp':
-        return char_comp_tab
+    if tab == 'tab-grain':
+        return grain_tab
+    elif tab == 'tab-comp':
+        return comp_tab
+    elif tab == 'tab-mat':
+        return mat_tab 
 
 ###### CALLBACKS GRAIN ROCKS
 @app.callback(Output('data_core', 'children'), 
@@ -473,11 +429,8 @@ def filter5(values):
 
 @app.callback(
      Output('char-grain-graph', 'figure'),
-     Input('data_core', 'children'),
-     State('tabs_char', 'value')) 
-def update_graph1(data, tab):
-    if tab != 'tab-char-grain':
-        return None
+     Input('data_core', 'children')) 
+def update_graph1(data):
     dff = pd.read_json(data, orient='split')
     return go.Figure(data=go.Scatter(x=dff['grain1'],
                                 y=dff['Depth (cm)'],
