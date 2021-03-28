@@ -6,6 +6,7 @@ import dash_core_components as dcc
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import dash_table
+import plotly.graph_objects as go
 
 import numpy as np
 import pandas as pd
@@ -202,10 +203,10 @@ opt_team = [{'label': x, 'value': x} for x in df_team]
 top_tab=html.Div([
     html.Div([
         html.Label(["Select nationality:", 
-                    dcc.Dropdown('my-drop-nat', options= opt_nat, value=[opt_nat[0]['value']], multi=True) # TRUE¿?
+                    dcc.Dropdown('my-drop-nat', options= opt_nat, value=['France'], multi=True) # TRUE¿?
                 ]),
         html.Label(["Select team:", 
-                    dcc.Dropdown('my-drop-team', options= opt_team, value=[opt_team[0]['value']], multi=True) # TRUE¿?
+                    dcc.Dropdown('my-drop-team', options= opt_team, value=['FC Lorient'], multi=True) # TRUE¿?
                 ]),
         html.Div(id='data_nat_team', style={'display': 'none'}),
         html.Div( 
@@ -215,7 +216,6 @@ top_tab=html.Div([
                 data=df_fifa.to_dict("records")
             )
         )
-#        html.Div(id='top-content')
     ],
     className= "app-body")
 ])
@@ -232,10 +232,16 @@ price_tab=html.Div([
 
 #### SUBTABS 2 ####
 
+df_pos=df_fifa_long['Position'].sort_values().unique()
+opt_pos = [{'label': x, 'value': x} for x in df_pos]
+
 pos_tab=html.Div([
     html.Div([  
-        
-
+        html.Label(["Select position:", 
+                    dcc.Dropdown('my-drop-pos', options= opt_pos, value=[opt_pos[0]['value']], multi=True) # TRUE¿?
+                ]),  
+       html.Div(id='data_pos', style={'display': 'none'}), 
+       dcc.Graph(id="pos-graph") 
     ],
     className= "app-body")
 ])
@@ -263,6 +269,82 @@ rocks_tab=html.Div([
 ])
 
 
+# ROCKS SUBTABS
+
+df_core=df_rocks['Core #'].sort_values().unique()
+opt_core = [{'label': x, 'value': x} for x in df_core]
+
+char_tab = html.Div([
+    html.Div([  
+        html.Label(["Select core:", 
+                    dcc.Dropdown('my-drop-core', options= opt_core, value=[opt_core[0]['value']], multi=True)                
+        ]), 
+        dcc.Tabs(id="tabs_char", value='tab-char-grain', 
+ #       style={
+ #       'width': '100%',
+ #       'font-size': '80%',
+ #       'height': '3vh',
+ #       'borderBottom': '1px solid #d6d6d6',
+ #       'padding': '6px',
+ #       'fontWeight': 'bold'
+ #       },
+        children=[
+            dcc.Tab(label='Grain size', value='tab-char-grain'),
+            dcc.Tab(label='Composition', value='tab-char-comp')
+        ]),
+        html.Div(id='char-content')
+    ],
+    className= "app-body")
+])
+
+char_grain_tab=html.Div([
+    html.Div([  
+       html.Div(id='data_core', style={'display': 'none'}),
+       dcc.Graph(id="char-grain-graph") 
+    ],
+    className= "app-body")
+])
+
+char_comp_tab=html.Div([
+    html.Div([ 
+
+    ],
+    className= "app-body")
+])
+
+def slider_map(min, max, steps=10):
+    scale = np.linspace(min, max, steps, endpoint=False)
+    return {i/10: '{}'.format(round(scale[i],2)) for i in range(steps)}
+
+min_depth = min(df_rocks_long['Depth (cm)'].dropna())
+max_depth = max(df_rocks_long['Depth (cm)'].dropna())
+
+comp_tab = html.Div([
+    html.Div([  
+        html.Label(["Range of values for depth (cm):", 
+                        dcc.RangeSlider(id="range",
+                            max= 1,
+                            min= 0,
+                            step= 1/125,
+                            marks= slider_map(min_depth, max_depth),
+                            value= [0,1],
+                        )
+                ]),
+        html.Div(id='data_comp', style={'display': 'none'}),
+        dcc.Graph(id="comp-graph")
+    ],
+    className= "app-body")
+])
+
+mat_tab = html.Div([
+    html.Div([  
+        
+
+    ],
+    className= "app-body")
+])
+
+
 # CALLBACKS
 @app.callback(Output('tabs-content', 'children'),
               Input('tabs', 'value'))
@@ -283,7 +365,59 @@ def render_content1(tab):
     elif tab == 'tab-price':
         return price_tab # LM MODEL???????????????????
 
+### CALLBACKS STATS FIFA
+@app.callback(Output('stats-content', 'children'),
+              Input('tabs_stats', 'value'))
+def render_content2(tab):
+    if tab == 'tab-gen':
+        return gen_tab
+    elif tab == 'tab-pos':
+        return pos_tab
+      
+      
+@app.callback(Output('data_stat', 'children'), 
+    Input('my-drop-stat', 'value'))
+def filter1(values):
+     filter1 = df_fifa_long['Stat'].isin(values) 
+     # more generally, this line would be
+     # json.dumps(cleaned_df)
+     return df_fifa_long[filter1].to_json(orient='split')
+      
 
+@app.callback(
+     Output('graph_gen', 'figure'),
+     Input('data_stat', 'children'),
+     State('tabs_stats', 'value')) 
+def update_graph1(data, tab):
+    if tab != 'tab-gen':
+        return None
+    dff = pd.read_json(data, orient='split')
+    return px.scatter(dff, x="stat_value", y="Overall", color="Position")
+    #color_discrete_sequence=px.colors.qualitative.G10
+    #color_discrete_map=col_stat)
+
+###### CALLBACKS POSITION FIFA
+
+@app.callback(Output('data_pos', 'children'), 
+    Input('my-drop-pos', 'value'),
+   Input('my-drop-stat', 'value'))
+def filter4(values_pos, values_stat):
+     filter4 = df_fifa_long['Position'].isin(values_pos) & df_fifa_long['Stat'].isin(values_stat) 
+     return df_fifa_long[filter4].to_json(orient='split')
+
+@app.callback( 
+     Output('pos-graph', 'figure'),
+     Input('data_pos', 'children'),
+     State('tabs_stats', 'value')) 
+def update_graph4(data, tab):
+    if tab != 'tab-pos':
+        return None
+    dff = pd.read_json(data, orient='split')
+    return px.scatter(dff, x="stat_value", y="Overall", color="Position")
+    #color_discrete_sequence=px.colors.qualitative.G10
+    #color_discrete_map=col_stat)
+   
+### CALLBACKS TABLE FIFA
 @app.callback(Output('data_nat_team', 'children'), 
     Input('my-drop-nat', 'value'),
     Input('my-drop-team', 'value'))
@@ -302,44 +436,10 @@ def update_table(data):
     return dff.to_dict("records")
 
 
-@app.callback(Output('stats-content', 'children'),
-              Input('tabs_stats', 'value'))
-def render_content2(tab):
-    if tab == 'tab-gen':
-        return gen_tab
-    elif tab == 'tab-pos':
-        return pos_tab
-
-
-@app.callback(Output('data_stat', 'children'), 
-    Input('my-drop-stat', 'value'))
-def filter1(values):
-     filter1 = df_fifa_long['Stat'].isin(values) 
-     # more generally, this line would be
-     # json.dumps(cleaned_df)
-     return df_fifa_long[filter1].to_json(orient='split')
-
-
-@app.callback(
-     Output('graph_gen', 'figure'),
-     Input('data_stat', 'children'),
-     State('tabs_stats', 'value')) 
-def update_graph1(data, tab):
-    if tab != 'tab-gen':
-        return None
-    dff = pd.read_json(data, orient='split')
-    return px.scatter(dff, x="stat_value", y="Overall", color="Position")
-    #color_discrete_sequence=px.colors.qualitative.G10
-    #color_discrete_map=col_stat)
-
-
-
-
 # CALLBACKS ROCKS
-
 @app.callback(Output('rocks-content', 'children'),
               Input('tabs_sub_rocks', 'value'))
-def render_content1(tab):
+def render_content3(tab):
     if tab == 'tab-char':
         return char_tab
     elif tab == 'tab-comp':
@@ -347,8 +447,52 @@ def render_content1(tab):
     elif tab == 'tab-mat':
         return mat_tab 
 
+### CALLBACKS CHARACTERISTICS ROCKS
+@app.callback(Output('char-content', 'children'),
+              Input('tabs_char', 'value'))
+def render_content(tab):
+    if tab == 'tab-char-grain':
+        return char_grain_tab 
+    elif tab == 'tab-char-comp':
+        return char_comp_tab
 
+###### CALLBACKS GRAIN ROCKS
+@app.callback(Output('data_core', 'children'), 
+    Input('my-drop-core', 'value'))
+def filter5(values):
+     filter5 = df_rocks['Core #'].isin(values) 
+     return df_rocks[filter5].to_json(orient='split')
 
+@app.callback(
+     Output('char-grain-graph', 'figure'),
+     Input('data_core', 'children'),
+     State('tabs_char', 'value')) 
+def update_graph1(data, tab):
+    if tab != 'tab-char-grain':
+        return None
+    dff = pd.read_json(data, orient='split')
+    return go.Figure(data=go.Scatter(x=dff['grain1'],
+                                y=dff['Depth (cm)'],
+                                mode='markers',
+                                marker_color="goldenrod"))
+    #color_discrete_sequence=px.colors.qualitative.G10
+    #color_discrete_map=col_stat)
+
+### CALLBACKS COMPOSITION ROCKS
+@app.callback(Output('data_comp', 'children'), 
+    Input('range', 'value'))
+def filter2(range):
+     filter2 = df_rocks_long['Depth (cm)'].between(min_depth * (max_depth/min_depth) ** range[0], min_depth * (max_depth/min_depth) ** range[1])
+     return df_rocks_long[filter2].to_json(orient='split')
+
+@app.callback(
+     Output('comp-graph', 'figure'),
+     Input('data_comp', 'children')) 
+def update_graph2(data):
+    dff2 = pd.read_json(data, orient='split')
+    return px.scatter(dff2, x="material", y="proportion", color="material")
+    #color_discrete_sequence=px.colors.qualitative.G10
+    #color_discrete_map=col_stat)
 
 
 if __name__ == '__main__':
