@@ -163,26 +163,31 @@ fifa_tab=html.Div([
 ])
 
 # STATS SELECTOR       
-## opt_stat=df_fifa_long['Stat'].sort_values().unique()
+
+df_stat=df_fifa_long['Stat'].sort_values().unique()
+opt_stat = [{'label': x, 'value': x} for x in df_stat]
+
 # Discrete Colors in Python
 # https://plotly.com/python/discrete-color/
-### col_stat = {x: px.colors.qualitative.G10[i] for i,x in enumerate(df_stat)}
+# col_stat = {x: px.colors.qualitative.G10[i] for i,x in enumerate(df_stat)}
 
+gen_tab = dcc.Graph(id="graph_gen")
 
 #### SUBTABS 1 ####
 
 # PLOTS
 stats_tab=html.Div([
     html.Div([  
-###        html.Label(["Select player stat:", 
-###                    dcc.Dropdown('my-dropdown', options= opt_stat, value= [opt_stat[0]['value']], multi=False)
-###                ]),
-###        html.Div(id='sel_stats', style={'display': 'none'}), # ?????????????????????????????????????
+        html.Label(["Select player stat:", 
+                    dcc.Dropdown('my-drop-stat', options= opt_stat, value= [opt_stat[0]['value']], multi=True, clearable = True,
+disabled = False)
+                ]),
+        html.Div(id='data_stat', style={'display': 'none'}),
         dcc.Tabs(id="tabs_stats", value='tab-gen', children=[
             dcc.Tab(label='General Rating', value='tab-gen'),
             dcc.Tab(label='Rating per Position', value='tab-pos'),
         ]),
-#        html.Div(id='stats-content')
+        html.Div(id='stats-content')
     ],
     className= "app-body")
 ])
@@ -282,7 +287,7 @@ def render_content1(tab):
     if tab == 'tab-stats':
         return stats_tab
     elif tab == 'tab-top':
-        return top_tab # Tabla filtrada por: Nacionalidad + Stat????????????????
+        return top_tab
     elif tab == 'tab-price':
         return price_tab # LM MODEL???????????????????
 
@@ -314,16 +319,36 @@ def render_content2(tab):
         return pos_tab
 
 
+@app.callback(Output('data_stat', 'children'), 
+    Input('my-drop-stat', 'value'))
+def filter1(values):
+     filter1 = df_fifa_long['Stat'].isin(values) 
+     # more generally, this line would be
+     # json.dumps(cleaned_df)
+     return df_fifa_long[filter1].to_json(orient='split')
+
+
+@app.callback(
+     Output('graph_gen', 'figure'),
+     Input('data_stat', 'children'),
+     State('tabs_stats', 'value')) 
+def update_graph1(data, tab):
+    if tab != 'tab-gen':
+        return None
+    dff = pd.read_json(data, orient='split')
+    return px.scatter(dff, x="stat_value", y="Overall", color="Stat")
+    #color_discrete_sequence=px.colors.qualitative.G10
+    #color_discrete_map=col_stat)
+
+
+
+
 # CALLBACKS ROCKS
 
 
 
 
-#@app.callback(Output('sel_stats', 'children'), 
-#    Input('my-dropdown', 'value'))
-#def filter(values):
-#     filter = df['Stat'].isin(values) # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#    return df[filter].to_json(date_format='iso', orient='split')
+
 
 if __name__ == '__main__':
     app.server.run(debug=True)
