@@ -108,7 +108,9 @@ df_fifa=df_fifa.rename(columns={"name": "Name", "age": "Age", "height_cm": "Heig
 "dribbling":"Dribbling", "curve":"Curve", "freekick_accuracy":"Freekick",
 "long_passing":"LongPassing", "ball_control":"Control",
 "acceleration":"Acceleration", "sprint_speed":"Speed"})
-   
+
+df_fifa.sort_values(by=['Overall'], inplace=True, ascending=False)
+
 df_fifa_long=pd.melt(df_fifa, id_vars=["Name", "Age", "Height", "Weight", "Nationality",
 "Overall", "Team", "Position"],
 value_vars=["Price", "Wage", "Crossing", "Finishing", "Heading", "ShortPassing", "Volleys",
@@ -130,6 +132,7 @@ app.layout= html.Div([
         'height': '8vh',
         'borderBottom': '1px solid #d6d6d6',
         'fontWeight': 'bold',
+        'font-family': 'Arial',
         'textAlign': 'center'
         },
         children=[
@@ -150,6 +153,7 @@ fifa_tab=html.Div([
         'height': '8vh',
         'borderBottom': '1px solid #d6d6d6',
         'fontWeight': 'bold',
+        'font-family': 'Arial',
         'textAlign': 'center'
         },
         children=[
@@ -188,6 +192,7 @@ disabled = False)
         'height': '8vh',
         'borderBottom': '1px solid #d6d6d6',
         'fontWeight': 'bold',
+        'font-family': 'Arial',
         'textAlign': 'center'
         }, 
         children=[
