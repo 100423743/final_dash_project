@@ -305,10 +305,6 @@ mat_tab = html.Div([
 ])
 
 
-
-
-
-
 # CALLBACKS
 @app.callback(Output('tabs-content', 'children'),
               Input('tabs', 'value'))
@@ -330,6 +326,7 @@ def render_content1(tab):
         return price_tab # LM MODEL???????????????????
 
 
+
 ### CALLBACKS STATS FIFA
 @app.callback(Output('stats-content', 'children'),
               Input('tabs_stats', 'value'))
@@ -338,14 +335,16 @@ def render_content2(tab):
         return gen_tab
     elif tab == 'tab-pos':
         return pos_tab
-
-@app.callback(Output('data_stat', 'children'), 
+      
+      
+ @app.callback(Output('data_stat', 'children'), 
     Input('my-drop-stat', 'value'))
 def filter1(values):
      filter1 = df_fifa_long['Stat'].isin(values) 
      # more generally, this line would be
      # json.dumps(cleaned_df)
      return df_fifa_long[filter1].to_json(orient='split')
+      
 
 @app.callback(
      Output('graph_gen', 'figure'),
@@ -358,8 +357,8 @@ def update_graph1(data, tab):
     return px.scatter(dff, x="stat_value", y="Overall", color="Position")
     #color_discrete_sequence=px.colors.qualitative.G10
     #color_discrete_map=col_stat)
-
-
+      
+   
 ### CALLBACKS TABLE FIFA
 @app.callback(Output('data_nat_team', 'children'), 
     Input('my-drop-nat', 'value'),
@@ -384,11 +383,12 @@ def update_table(data):
               Input('tabs_sub_rocks', 'value'))
 def render_content3(tab):
     if tab == 'tab-char':
-        return char_tab
-    elif tab == 'tab-comp':
-        return comp_tab
-    elif tab == 'tab-mat':
-        return mat_tab 
+          return char_tab
+      elif tab == 'tab-comp':
+          return comp_tab
+      elif tab == 'tab-mat':
+          return mat_tab 
+
 
 ### CALLBACKS COMPOSITION ROCKS
 @app.callback(Output('data_comp', 'children'), 
@@ -405,9 +405,6 @@ def update_graph2(data):
     return px.scatter(dff2, x="material", y="proportion", color="material")
     #color_discrete_sequence=px.colors.qualitative.G10
     #color_discrete_map=col_stat)
-
-
-
 
 
 if __name__ == '__main__':
