@@ -124,15 +124,14 @@ app.layout= html.Div([
     ),
     html.Div([  
         dcc.Tabs(id="tabs", value='tab-fifa', 
-#        style={
-#        'width': '90%',
-#        'font-size': '120%',
-#        'height': '3vh',
-#        'borderBottom': '1px solid #d6d6d6',
-#        'padding': '20px',
-#        'fontWeight': 'bold',
-#        'textAlign': 'center'
-#        },
+        style={
+        'width': '100%',
+        'font-size': '130%',
+        'height': '8vh',
+        'borderBottom': '1px solid #d6d6d6',
+        'fontWeight': 'bold',
+        'textAlign': 'center'
+        },
         children=[
             dcc.Tab(label='FIFA', value='tab-fifa'),
             dcc.Tab(label='Rocks', value='tab-rocks'),
@@ -145,18 +144,17 @@ app.layout= html.Div([
 fifa_tab=html.Div([
     html.Div([  
         dcc.Tabs(id="tabs_sub_fifa", value='tab-stats', 
-#        style={
-#        'width': '100%',
-#        'font-size': '80%',
-#        'height': '3vh',
-#        'borderBottom': '1px solid #d6d6d6',
-#        'padding': '6px',
-#        'fontWeight': 'bold'
-#        },
+        style={
+        'width': '100%',
+        'font-size': '110%',
+        'height': '8vh',
+        'borderBottom': '1px solid #d6d6d6',
+        'fontWeight': 'bold',
+        'textAlign': 'center'
+        },
         children=[
             dcc.Tab(label='Stats', value='tab-stats'),
-            dcc.Tab(label='Top Players', value='tab-top'),
-            dcc.Tab(label='Price Calculator', value='tab-price'),
+            dcc.Tab(label='Top Players', value='tab-top')
         ]),
         html.Div(id='fifa-content')
     ],
@@ -178,13 +176,21 @@ gen_tab = dcc.Graph(id="graph_gen")
 
 # PLOTS
 stats_tab=html.Div([
-    html.Div([  
-        html.Label(["Select player stat:", 
+    html.Div([html.Label(["Select player stat:", 
                     dcc.Dropdown('my-drop-stat', options= opt_stat, value= [opt_stat[0]['value']], multi=True, clearable = True,
 disabled = False)
                 ]),
         html.Div(id='data_stat', style={'display': 'none'}),
-        dcc.Tabs(id="tabs_stats", value='tab-gen', children=[
+        dcc.Tabs(id="tabs_stats", value='tab-gen',
+        style={
+        'width': '100%',
+        'font-size': '90%',
+        'height': '8vh',
+        'borderBottom': '1px solid #d6d6d6',
+        'fontWeight': 'bold',
+        'textAlign': 'center'
+        }, 
+        children=[
             dcc.Tab(label='General Rating', value='tab-gen'),
             dcc.Tab(label='Rating per Position', value='tab-pos'),
         ]),
@@ -220,15 +226,6 @@ top_tab=html.Div([
     className= "app-body")
 ])
 
-# LINEAR MODEL
-price_tab=html.Div([
-    html.Div([  
-        
-#        html.Div(id='price-content')
-    ],
-    className= "app-body")
-])
-
 
 #### SUBTABS 2 ####
 
@@ -250,14 +247,14 @@ pos_tab=html.Div([
 rocks_tab=html.Div([
     html.Div([  
         dcc.Tabs(id="tabs_sub_rocks", value='tab-grain', 
- #       style={
- #       'width': '100%',
- #       'font-size': '80%',
- #       'height': '3vh',
- #       'borderBottom': '1px solid #d6d6d6',
- #       'padding': '6px',
- #       'fontWeight': 'bold'
- #       },
+        style={
+        'width': '100%',
+        'font-size': '110%',
+        'height': '7vh',
+        'borderBottom': '1px solid #d6d6d6',
+        'fontWeight': 'bold',
+        'textAlign': 'center'
+        },
         children=[
             dcc.Tab(label='Grain Size per core', value='tab-grain'),
             dcc.Tab(label='Composition per depth', value='tab-comp'),
@@ -309,10 +306,17 @@ comp_tab = html.Div([
     className= "app-body")
 ])
 
-mat_tab = html.Div([
-    html.Div([  
-        
+df_mat=df_rocks_long['material'].sort_values().unique()
+opt_mat = [{'label': x, 'value': x} for x in df_mat]
 
+mat_tab = html.Div([
+    html.Div([    
+        html.Label(["Select material:", 
+                    dcc.Dropdown('my-drop-mat', options= opt_mat, value=[opt_mat[0]['value']], multi=True)
+        ]),  
+       html.Div(id='data_mat', style={'display': 'none'}), 
+       dcc.Graph(id="mat-graph"),
+       dash_table.DataTable(id='selected_Data', columns=[{"name": i, "id": i} for i in df_rocks_long.columns])
     ],
     className= "app-body")
 ])
@@ -335,8 +339,6 @@ def render_content1(tab):
         return stats_tab
     elif tab == 'tab-top':
         return top_tab
-    elif tab == 'tab-price':
-        return price_tab # LM MODEL???????????????????
 
 ### CALLBACKS STATS FIFA
 @app.callback(Output('stats-content', 'children'),
@@ -455,6 +457,32 @@ def update_graph2(data):
     #color_discrete_sequence=px.colors.qualitative.G10
     #color_discrete_map=col_stat)
 
+### CALLBACKS MATERIAL ROCKS
+
+@app.callback(Output('data_mat', 'children'), 
+    Input('my-drop-mat', 'value'))
+def filter7(values):
+     filter7 = df_rocks_long['material'].isin(values)
+     return df_rocks_long[filter7].to_json(orient='split')
+
+@app.callback( 
+     Output('mat-graph', 'figure'),
+     Input('data_mat', 'children')) 
+def update_graph7(data):
+    dff = pd.read_json(data, orient='split')
+    return px.scatter(dff, x="Depth (cm)", y="proportion", color="material", custom_data=[list(dff.index)])
+    #color_discrete_sequence=px.colors.qualitative.G10
+    #color_discrete_map=col_stat)
+
+#@app.callback( 
+#     Output('selected_Data', 'data'),
+#     Input('mat-graph', 'selectedData')) 
+#def display(selectedData):
+#    if selectedData is None:
+#        return None
+#    names = [o["customdata"][0] for o in selectedData["points"]]
+#    filter = df_rocks_long[df_rocks_long.index.isin(names)]
+#    return df_rocks_long[filter].to_dict('records')
 
 if __name__ == '__main__':
     app.server.run(debug=True)
