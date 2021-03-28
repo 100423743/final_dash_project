@@ -1,7 +1,11 @@
 Master Title: Master in Statistics for Data Science
+
 Course title: Data Tidying and Reporting
+
 Year: 2020/2021
+
 Students Names: Ignacio Medina de Andrés & María Cristina Sánchez Iglesias
+
 GitHub repository url: https://github.com/100423743/final_dash_project
 
 
