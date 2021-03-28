@@ -1,3 +1,10 @@
+Master Title: Master in Statistics for Data Science
+Course title: Data Tidying and Reporting
+Year: 2020/2021
+Students Names: Ignacio Medina de Andrés & María Cristina Sánchez Iglesias
+GitHub repository url: https://github.com/100423743/final_dash_project
+
+
 This Dash project study two different datasets. One of them is about FIFA football players and its ratings, and the other one analyses information about rocks from regions that have many large earthquake and landslide event.
 
 'FIFA' allows the user to study and observe different worldwide football player stats, obtained and assigned by the FIFA (Fédération Internationale de Football Association).
