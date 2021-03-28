@@ -195,10 +195,10 @@ opt_team=df_fifa['Team'].sort_values().unique()
 top_tab=html.Div([
     html.Div([
         html.Label(["Select nationality:", 
-                    dcc.Dropdown('my-drop-nat', options= opt_nat, value= [opt_nat[0]['value']], multi=False) # TRUE¿?
+                    dcc.Dropdown('my-drop-nat', options= opt_nat, value=opt_nat[0], multi=False) # TRUE¿?
                 ]),
         html.Label(["Select team:", 
-                    dcc.Dropdown('my-drop-team', options= opt_team, value= [opt_team[0]['value']], multi=False) # TRUE¿?
+                    dcc.Dropdown('my-drop-team', options= opt_team, value=opt_team[0], multi=False) # TRUE¿?
                 ]),
         html.Div( 
         dash_table.DataTable(
@@ -284,13 +284,15 @@ def render_content1(tab):
         return price_tab # LM MODEL???????????????????
 
 
-@app.callback(
-     Output('my-table', 'data'),
-     Input('my-dropdown', 'value'))
-def update_data(value):
-    filter = df['quality'] == value
-    return df[filter].to_dict("records")
+@app.callback(Output('data', 'children'), 
+    Input('my-drop-nat', 'value'),
+    Input('my-drop-team', 'value'))
+def filter(nat, team):
+     filter = df_fifa['Nationality'].isin(nat) & df_fifa['Team'].isin(team)
 
+     # more generally, this line would be
+     # json.dumps(cleaned_df)
+     return df_fifa[filter].to_json(date_format='iso', orient='split')
 
 
 @app.callback(Output('stats-content', 'children'),
