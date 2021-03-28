@@ -395,6 +395,14 @@ def update_graph1(data, tab):
     return px.scatter(dff, x="stat_value", y="Overall", color="Position")
     #color_discrete_sequence=px.colors.qualitative.G10
     #color_discrete_map=col_stat)
+      
+   
+### CALLBACKS TABLE FIFA
+@app.callback(Output('data_nat_team', 'children'), 
+    Input('my-drop-nat', 'value'),
+    Input('my-drop-team', 'value'))
+def filter(nat, team):
+     filter = df_fifa['Nationality'].isin(nat) & df_fifa['Team'].isin(team)
 
 ###### CALLBACKS POSITION FIFA
 
@@ -441,11 +449,11 @@ def update_table(data):
               Input('tabs_sub_rocks', 'value'))
 def render_content3(tab):
     if tab == 'tab-char':
-        return char_tab
-    elif tab == 'tab-comp':
-        return comp_tab
-    elif tab == 'tab-mat':
-        return mat_tab 
+          return char_tab
+      elif tab == 'tab-comp':
+          return comp_tab
+      elif tab == 'tab-mat':
+          return mat_tab 
 
 ### CALLBACKS CHARACTERISTICS ROCKS
 @app.callback(Output('char-content', 'children'),
