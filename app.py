@@ -231,14 +231,6 @@ price_tab=html.Div([
 
 
 #### SUBTABS 2 ####
-gen_tab=html.Div([
-    html.Div([  
-        
-
-    ],
-    className= "app-body")
-])
-
 
 pos_tab=html.Div([
     html.Div([  
@@ -336,7 +328,7 @@ def update_graph1(data, tab):
     if tab != 'tab-gen':
         return None
     dff = pd.read_json(data, orient='split')
-    return px.scatter(dff, x="stat_value", y="Overall", color="Stat")
+    return px.scatter(dff, x="stat_value", y="Overall", color="Position")
     #color_discrete_sequence=px.colors.qualitative.G10
     #color_discrete_map=col_stat)
 
@@ -345,6 +337,15 @@ def update_graph1(data, tab):
 
 # CALLBACKS ROCKS
 
+@app.callback(Output('rocks-content', 'children'),
+              Input('tabs_sub_rocks', 'value'))
+def render_content1(tab):
+    if tab == 'tab-char':
+        return char_tab
+    elif tab == 'tab-comp':
+        return comp_tab
+    elif tab == 'tab-mat':
+        return mat_tab 
 
 
 
